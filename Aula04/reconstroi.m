@@ -1,12 +1,12 @@
 function [x,Ta] = reconstroi(X,f)
 
+Ta = 1/f;
 N = length(X);
-X = ifftshift(X);
-x = ifft(X)*N;
-fa = f*2;
-Ta = 1/fa;
-
 t = (0:N-1)*Ta;
+
+X = X*N;
+X = ifftshift(X);
+x = ifft(X);
 
 plot(t,x)
 xlabel('Tempo (s)');
