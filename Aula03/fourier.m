@@ -10,7 +10,7 @@ for k=1:K
     sin_k = sin(k*T0*t);
     cos_k = cos(k*T0*t);
    
-    a_k(k) = sum(x.*cos_k*Ta)*2/T0;
-    b_k(k) = sum(x.*sin_k*Ta)*2/T0;
+    a_k(k) = sum(x.*cos_k.*Ta).*2/T0;
+    b_k(k) = sum(x.*sin_k.*Ta).*2/T0;
 
 end
