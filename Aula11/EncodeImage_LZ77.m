@@ -10,31 +10,38 @@ function Stream = EncodeImage_LZ77(Image,Nw,Mw)
 % verificar se 1o simbolo de Mw existe, se nao existir é imediatamente
 % copiado, se existir, procuram-se sequencias maiores
 
+Image = Image.';
+[Symb,~,Image_new] = unique(Image(:));
+Image_new = uint8(Image_new);
+Stream(1:Nw,1) = Image_new(1:Nw);
+pos = Nw+1;
+pos_stream = Nw+1;
+max_len = length(Image_new);
 
-Image = Image';    %vetorizar a imagem
-Image = Image(:);
-
-[Simb,N,Im] = unique(Image);   %Im = conjunto indices dentro da tabela
-
-%tem de ir a image, buscar os primeiros Nw simbolos e copiar para a stream
-Stream(1:Nw) = Im(1:Nw);
-
-%escolher ponteiro para o simbolo a tentar codificar
-pos = Nw+1;     %imediatamente a seguir a Mw; incrementado 
-pos_st = Nw+1;  %ponteiro na stream
-
-% enquanto tiver simbolos para codificar (ponteiro dentro da imagem)
-while (pos <= length(Im))
-    wind = Im(pos-Nw:pos-1);
-    Mw_end = min(pos+Mw-1,legnth(Im)); %final da janela 
-    seq = Im(pos:Mw_end); %total a tentar codificar(procurar)
-    for k=1:length(seq)
-        ind = strfind(wind,seq(1:k))
-        if(isempty(ind))
+while (pos<=max_len)
+    wind = Image_new(pos-Nw:pos-1);
+    Mlen = min(pos+Mw-1,max_len);
+    seq = Image_new(pos:Mlen);
+    for k1 = 1:length(seq)
+        index = strfind(wind:seq(1:k1)');
+        if(isempty(index)
+            size_found = k1-1;
             break;
+        else
+            size_found = k1;
+            index_found = index(1);
         end
     end
+    if (size_found < 2)
+        Stream(pos_stream) - Image_new(pos);
+        size_found = 1;
+        pos_stream = pos_stream + 1;
+    else
+        Stream(pos_stream) = 2^7 + uint8(index_found);
+        Stream(pos_stream+1) = uint8(size_found);
+        pos_stream = pos_stream+2;
+    end
+    pos = pos+size_found;
 end
-    
 
 end
